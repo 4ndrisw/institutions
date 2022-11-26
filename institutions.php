@@ -182,7 +182,7 @@ function institutions_module_init_menu_items()
             'position'   => 57,
             ]);
 
-    if (has_permission('institutions', '', 'view')) {
+    if (has_permission('institutions', '', 'edit')) {
         $CI->app_menu->add_sidebar_menu_item('institutions', [
                 'slug'     => 'institutions-tracking',
                 'name'     => _l('institutions'),

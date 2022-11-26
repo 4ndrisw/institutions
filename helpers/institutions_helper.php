@@ -1,6 +1,7 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
+
 function get_institutions_sql($userid='')
 {    
     $CI = &get_instance();
