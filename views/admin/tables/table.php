@@ -66,7 +66,6 @@ if (count($countryIds) > 0) {
 
 // Filter by programs
 $programStatusIds = [];
-//$this->ci->load->model('programs_model');
 $program_states = get_program_states();
 
 foreach ($program_states as $state) {
