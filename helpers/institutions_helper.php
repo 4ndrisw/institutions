@@ -831,3 +831,148 @@ function is_staff_related_to_institution($client_id){
 
     return false;    
 }
+
+function get_institution_next_number($institution_id, $category, $inspector_id = ''){
+    $CI = &get_instance();
+    $CI->db->where('institution_id', $institution_id);
+    $CI->db->where('category', $category);
+    
+        //$CI->db->where('inspector_id', $inspector_id);
+
+    $result = $CI->db->get(db_prefix() . 'lincence_institution_next_number')->row('next_number');
+    
+    return $result;
+}
+
+
+/**
+ * Function used to get related data based on rel_id and rel_type
+ * Eq in the tasks section there is field where this task is related eq institution with number INV-0005
+ * @param  string $type
+ * @param  string $rel_id
+ * @param  array $extra
+ * @return mixed
+ */
+function institutions_get_relation_datas($type, $rel_id = '', $extra = [])
+{
+    $CI = & institutions_get_instance();
+    $q  = '';
+    if ($CI->input->post('q')) {
+        $q = $CI->input->post('q');
+        $q = trim($q);
+    }
+
+    //$data = [];
+    if ($type == 'institution' || $type == 'institutions') {
+        log_activity( __FILE__ . ' ' . $type);
+        /*
+        $where_clients = ''; 
+        if ($q) {
+            $where_clients .= '(company LIKE "%' . $CI->db->escape_like_str($q) . '%" ESCAPE \'!\' OR CONCAT(firstname, " ", lastname) LIKE "%' . $CI->db->escape_like_str($q) . '%" ESCAPE \'!\' OR email LIKE "%' . $CI->db->escape_like_str($q) . '%" ESCAPE \'!\') AND ' . db_prefix() . 'clients.active = 1';
+        }
+
+        $data = $CI->clients_model->get($rel_id, $where_clients);
+        */
+
+            if ($rel_id != '') {
+                $CI->load->model('institutions_model');
+                $data = $CI->institutions_model->get($rel_id);
+            } else {
+                $search = $CI->institutions_model->_search_institutions($q);
+                $data   = $search['result'];
+            }
+        
+    }
+        log_activity( __FILE__ . ' ' . json_encode($data));
+
+
+//    $data = hooks()->apply_filters('get_relation_data', $data, compact('type', 'rel_id', 'extra'));
+
+    return $data;
+}
+/**
+ * Ger relation values eq institution number or project name etc based on passed relation parsed results
+ * from function institutions_get_relation_data
+ * $relation can be object or array
+ * @param  mixed $relation
+ * @param  string $type
+ * @return mixed
+ */
+function institutions_get_relation_values($relation, $type)
+{
+    if ($relation == '') {
+        return [
+            'name'      => '',
+            'id'        => '',
+            'link'      => '',
+            'addedfrom' => 0,
+            'subtext'   => '',
+            ];
+    }
+
+    $addedfrom = 0;
+    $name      = '';
+    $id        = '';
+    $link      = '';
+    $subtext   = '';
+
+    if ($type == 'institution' || $type == 'institutions') {
+        if (is_array($relation)) {
+            $id   = $relation['userid'];
+            $name = $relation['company'];
+        } else {
+            $id   = $relation->userid;
+            $name = $relation->company;
+        }
+        $link = admin_url('institutions/institution/' . $id);
+    }
+
+    return hooks()->apply_filters('relation_values', [
+        'id'        => $id,
+        'name'      => $name,
+        'link'      => $link,
+        'addedfrom' => $addedfrom,
+        'subtext'   => $subtext,
+        'type'      => $type,
+        ]);
+}
+
+/**
+ * Function used to render <option> for relation
+ * This function will do all the necessary checking and return the options
+ * @param  mixed $data
+ * @param  string $type   rel_type
+ * @param  string $rel_id rel_id
+ * @return string
+ */
+function institutions_init_relation_options($data, $type, $rel_id = '')
+{
+    $_data = [];
+
+    $has_permission_institutions_view = has_permission('institutions', '', 'view');
+
+    $is_admin                      = is_admin();
+    $CI                            = & institutions_get_instance();
+    $CI->load->model('projects_model');
+
+    foreach ($data as $relation) {
+        $relation_values = institutions_get_relation_values($relation, $type);
+        if ($type == 'institution') {
+            if (!$has_permission_institutions_view && !have_assigned_institutions() && $rel_id != $relation_values['id']) {
+                continue;
+            } elseif (have_assigned_institutions() && $rel_id != $relation_values['id'] && !$has_permission_institutions_view) {
+                if (!is_institution_admin($relation_values['id'])) {
+                    continue;
+                }
+            }
+        }
+
+        $_data[] = $relation_values;
+        //  echo '<option value="' . $relation_values['id'] . '"' . $selected . '>' . $relation_values['name'] . '</option>';
+    }
+
+    $_data = hooks()->apply_filters('init_relation_options', $_data, compact('data', 'type', 'rel_id'));
+
+    return $_data;
+}
+

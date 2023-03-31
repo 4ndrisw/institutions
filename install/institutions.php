@@ -69,4 +69,13 @@ if (!$CI->db->table_exists(db_prefix() . 'institutions')) {
 
     $CI->db->query('ALTER TABLE `' . db_prefix() . 'institutions`
       MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1');
+
+    $CI->db->query('ALTER TABLE `' . db_prefix() . 'clients` ADD `is_institution` TINYINT(1) DEFAULT NULL, ADD INDEX `is_institution` (`is_institution`);');
+    $CI->db->query('ALTER TABLE `' . db_prefix() . 'clients` ADD `number` INT(11) DEFAULT NULL, ADD INDEX `number` (`number`) ;');
+    $CI->db->query('ALTER TABLE `' . db_prefix() . 'clients` ADD `prefix` VARCHAR(10) NULL DEFAULT NULL;');
+    $CI->db->query('ALTER TABLE `' . db_prefix() . 'clients` ADD `number_format` VARCHAR(20) NULL DEFAULT NULL;');
+    $CI->db->query('ALTER TABLE `' . db_prefix() . 'clients` ADD `hash` VARCHAR(32) NULL DEFAULT NULL;');
+    //$CI->db->query('ALTER TABLE `' . db_prefix() . 'clients` ADD `head_id` INT(11) DEFAULT NULL ;');
+    $CI->db->query('ALTER TABLE `' . db_prefix() . 'clients` ADD `isedit` TINYINT(1) NOT NULL DEFAULT "0" ;');
+
 }

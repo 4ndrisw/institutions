@@ -30,7 +30,7 @@ INSERT INTO `tblemailtemplates` (`type`, `slug`, `language`, `name`, `subject`, 
 
 // Add options for institutions
 add_option('delete_only_on_last_institution', 1);
-add_option('institution_prefix', 'SCH-');
+add_option('institution_prefix', 'DNS-');
 add_option('next_institution_number', 1);
 add_option('default_institution_assigned', 9);
 add_option('institution_number_decrement_on_delete', 0);
@@ -62,6 +62,8 @@ DROP TABLE `tblinstitution_activity`, `tblinstitution_items`, `tblinstitution_me
 delete FROM `tbloptions` WHERE `name` LIKE '%institution%';
 DELETE FROM `tblemailtemplates` WHERE `type` LIKE 'institution';
 
-
+DELETE FROM `tblclients` WHERE `tblclients`.`is_institution` = 1;
+ALTER TABLE `tblclients` DROP INDEX `number`;
+ALTER TABLE `tblclients` DROP `number`;
 
 */

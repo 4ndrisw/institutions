@@ -101,29 +101,23 @@
             </div>
 
             <div class="row">
-               <div class="col-md-6">
-                 <?php $value = (isset($institution) ? $institution->siup : ''); ?>
-                 <?php echo render_input('siup','siup',$value); ?>
+
+               <div class="col-md-12">
+                      <?php
+                     $selected = '';
+                     foreach($staff as $member){
+                      if(isset($institution)){
+                        if($institution->head_id == $member['staffid']) {
+                          $selected = $member['staffid'];
+                        }
+                      }
+                     }
+                     echo render_select('head_id',$staff,array('staffid',array('firstname','lastname')),'head_string',$selected);
+                     ?>
                </div>
-               <div class="col-md-6">
-                 <?php $value = (isset($institution) ? $institution->vat : ''); ?>
-                 <?php echo render_input('vat','vat',$value); ?>
-               </div>
+
             </div>
-            <div class="row">
-               <div class="col-md-6">
-                  <?php if (get_option('institutions_use_bpjs_kesehatan_field') == 1) {
-                     $value = (isset($institution) ? $institution->bpjs_kesehatan : '');
-                     echo render_input('bpjs_kesehatan', 'bpjs_kesehatan', $value);
-                  } ?>
-               </div>
-               <div class="col-md-6">
-                  <?php if (get_option('institutions_use_bpjs_ketenagakerjaan_field') == 1) {
-                     $value = (isset($institution) ? $institution->bpjs_ketenagakerjaan : '');
-                     echo render_input('bpjs_ketenagakerjaan', 'bpjs_ketenagakerjaan', $value);
-                  } ?>
-               </div>
-            </div>
+
 
             <div class="row">
                <div class="col-md-6">

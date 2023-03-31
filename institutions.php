@@ -30,6 +30,9 @@ hooks()->add_filter('global_search_result_output', 'institutions_global_search_r
 hooks()->add_filter('get_dashboard_widgets', 'institutions_add_dashboard_widget');
 hooks()->add_filter('module_institutions_action_links', 'module_institutions_action_links');
 
+//hooks()->add_filter('get_relation_data','institutions_get_relation_data');
+//hooks()->add_filter('relation_values', 'institutions_relation_values');
+//hooks()->add_filter('init_relation_options', 'institutions_init_relation_options');
 
 function institutions_add_dashboard_widget($widgets)
 {

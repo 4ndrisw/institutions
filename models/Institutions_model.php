@@ -63,13 +63,16 @@ class Institutions_model extends Clients_Model
         return $this->db->query("SELECT DISTINCT(sale_agent) as sale_agent, CONCAT(firstname, ' ', lastname) as full_name FROM " . db_prefix() . 'institutions JOIN ' . db_prefix() . 'staff on ' . db_prefix() . 'staff.staffid=' . db_prefix() . 'institutions.sale_agent WHERE sale_agent != 0')->result_array();
     }
 
+
+
+
     /**
      * Get client object based on passed clientid if not passed clientid return array of all clients
      * @param  mixed $id    client id
      * @param  array  $where
      * @return mixed
      */
-    public function get($id = '', $where = [])
+    public function get($id = '', $where = ['is_institution'=>1])
     {
         $this->db->select('*,'. db_prefix() . 'clients.userid as userid,');
 
@@ -90,7 +93,7 @@ class Institutions_model extends Clients_Model
             }
 
             $this->load->model('email_schedule_model');
-            $client->scheduled_email = $this->email_schedule_model->get($id, 'institution');
+            $client->scheduled_email = $this->email_schedule_model->get($id, 'company');
 
             $GLOBALS['client'] = $client;
 
@@ -101,6 +104,40 @@ class Institutions_model extends Clients_Model
         $result = $this->db->get(db_prefix() . 'clients')->result_array();
         return $result;
     }
+
+    public function get_select_option($id = '', $where = ['is_institution'=>1])
+    {
+        $this->db->select('company,'. db_prefix() . 'clients.userid as userid,');
+
+        $this->db->join(db_prefix() . 'countries', '' . db_prefix() . 'countries.country_id = ' . db_prefix() . 'clients.country', 'left');
+        //$this->db->join(db_prefix() . 'contacts', '' . db_prefix() . 'contacts.userid = ' . db_prefix() . 'clients.userid AND is_primary = 1', 'left');
+
+        if ((is_array($where) && count($where) > 0) || (is_string($where) && $where != '')) {
+            $this->db->where($where);
+        }
+
+        if (is_numeric($id)) {
+
+            $this->db->where(db_prefix() . 'clients.userid', $id);
+            $client = $this->db->get(db_prefix() . 'clients')->row();
+
+            if ($client && get_option('company_requires_vat_number_field') == 0) {
+                $client->vat = null;
+            }
+
+            //$this->load->model('email_schedule_model');
+            //$client->scheduled_email = $this->email_schedule_model->get($id, 'company');
+
+            $GLOBALS['client'] = $client;
+
+            return $client;
+        }
+
+        $this->db->order_by('company', 'asc');
+        $result = $this->db->get(db_prefix() . 'clients')->result_array();
+        return $result;
+    }
+
 
     /**
      * Get institution states
@@ -441,7 +478,7 @@ class Institutions_model extends Clients_Model
         if ($this->db->affected_rows() > 0) {
             $updated = true;
             $institution = $this->get($id);
-
+            /*
             $fields = array('company', 'vat','siup', 'bpjs_kesehatan', 'bpjs_ketenagakerjaan', 'phonenumber');
             $custom_data = '';
             foreach ($fields as $field) {
@@ -449,6 +486,7 @@ class Institutions_model extends Clients_Model
                     $custom_data .= str_replace('_', ' ', $field) .' '. $origin->$field . ' to ' .$institution->$field .'<br />';
                 }
             }
+            */
             $this->log_institution_activity($origin->userid, 'institution_activity_changed', false, serialize([
                 '<custom_data>'. $custom_data .'</custom_data>',
             ]));

@@ -66,8 +66,10 @@ if (count($countryIds) > 0) {
 
 // Filter by programs
 $programStatusIds = [];
-$program_states = get_program_states();
-
+$program_states = [];
+if(function_exists('get_program_states')){
+    $program_states = get_program_states();
+}
 foreach ($program_states as $state) {
     if ($this->ci->input->post('programs_' . $state['id'])) {
         array_push($programStatusIds, $state['id']);

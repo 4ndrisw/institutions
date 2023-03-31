@@ -232,12 +232,16 @@
                             <div role="tabpanel" class="tab-pane" id="staff_permissions">
                                 <?php
                         hooks()->do_action('institution_render_permissions');
+                        //$availabe_roles = ['5'=>'Admin Dinas', '2'=>'Kepala Dinas'];
+                        $availabe_roles = ['5', '2'];
                         
                         foreach ($roles as $key => $role) {
-                            if (get_option('default_institution_role') !== $role['roleid']) {
+                            //if (get_option('default_institution_role') !== $role['roleid']) {
+                            if ( !in_array($role['roleid'], $availabe_roles)) {
                                 unset($roles[$key]);
                             }
                         }
+                        
 
                         $selected = '';
                         foreach ($roles as $role) {
@@ -246,8 +250,9 @@
                                     $selected = $role['roleid'];
                                 }
                             } else {
-                                $default_institution_role = get_option('default_institution_role');
-                                if ($default_institution_role == $role['roleid']) {
+                                //$default_institution_role = get_option('default_institution_role');
+                                $availabe_roles = ['5'=>'Admin Dinas', '2'=>'Kepala Dinas'];
+                                if ($availabe_roles == $role['roleid']) {
                                     $selected = $role['roleid'];
                                 }
                             }

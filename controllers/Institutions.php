@@ -143,18 +143,22 @@ class Institutions extends AdminController
                 }
             }
         }
+
         if ($id == '') {
             $title = _l('create_new_institution');
+            $clientid = $id;
         } else {
             $institution = $this->institutions_model->get($id);
-
+            $clientid = $id;
             if (!$institution || !user_can_view_institution($id)) {
                 blank_page(_l('institution_not_found'));
             }
-            $data['institution'] = $institution;
+
             $data['edit']     = true;
+            $data['institution'] = $institution;
             $title            = _l('edit', _l('institution_lowercase'));
         }
+        $data['staff']             = $this->staff_model->get('', ['active' => 1,'client_type'=>'institution', 'client_id'=>$clientid]);
 
         $data['institution_states'] = $this->institutions_model->get_states();
         $data['title']             = $title;
